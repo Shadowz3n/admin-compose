@@ -2,8 +2,7 @@ version: '3.8'
 
 services:
   ui:
-    build:
-      context: git@github.com:Shadowz3n/admin-ui.git
+    build: https://github.com/Shadowz3n/admin-ui.git
     restart: always
     volumes:
       - ./ui:/usr/src/ui
@@ -12,8 +11,7 @@ services:
       - 8080:8080
     command: ['npm', 'run', 'docker-serve']
   api:
-    build:
-      context: git@github.com:Shadowz3n/admin-api.git
+    build: https://github.com/Shadowz3n/admin-api.git
     restart: always
     volumes:
       - ./api:/usr/src/api
