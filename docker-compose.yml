@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  ui:
+    build:
+      context: git@github.com:Shadowz3n/admin-ui.git
+    restart: always
+    volumes:
+      - ./ui:/usr/src/ui
+    working_dir: /usr/src/ui
+    ports:
+      - 8080:8080
+    command: ['npm', 'run', 'docker-serve']
+  api:
+    build:
+      context: git@github.com:Shadowz3n/admin-api.git
+    restart: always
+    volumes:
+      - ./api:/usr/src/api
+    ports:
+      - 8000:8000
+    environment:
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8000
+      DATABASE_URL: 'postgres://henrique:password@db/imps'
+      MY_LOG_LEVEL: 'info'
+      MY_LOG_STYLE: 'Always'
+    depends_on:
+      - db
+    links:
+      - db
+    working_dir: /usr/src/api
+    command: ['cargo', 'run']
+  db:
+    image: 'postgres:13-alpine'
+    restart: on-failure
+    environment:
+      POSTGRES_DB: 'imps'
+      POSTGRES_HOST: 'localhost'
+      POSTGRES_USER: 'henrique'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_PORT: 5432
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U henrique -d imps']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
